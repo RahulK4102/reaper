@@ -202,7 +202,15 @@ func (b *Bus) Run(ctx context.Context, output chan<- node.Output) error {
 			}
 			defer close(out)
 			if err := n.Start(ctx, in, out, output); err != nil {
-				if errors.Is(err, context.Canceled) {
+				if errors.Is(err, node.ErrStopped) {
+					b.updateStatus(ctx, Update{
+						Node:    n.ID(),
+						Name:    n.Name(),
+						Status:  NodeStatusSuccess,
+						Message: "Stopped",
+					})
+					cancel()
+				} else if errors.Is(err, context.Canceled) {
 					if !b.isAborted() {
 						b.abort()
 					}
@@ -256,6 +264,7 @@ func (b *Bus) Run(ctx context.Context, output chan<- node.Output) error {
 
 				routes := b.routes[n.ID().String()+":"+msg.OutputName]
 
+				var wg sync.WaitGroup
 				for _, route := range routes {
 					b.updateStatus(ctx, Update{
 						Node:    route.node,
@@ -271,7 +280,10 @@ func (b *Bus) Run(ctx context.Context, output chan<- node.Output) error {
 					if b.isAborted() {
 						return
 					}
-					func() {
+					wg.Add(1)
+					// TODO: do these on goroutines?
+					go func() {
+						defer wg.Done()
 						// last ditch to catch rogue chan writes
 						defer func() {
 							if p := recover(); p != nil {
@@ -290,6 +302,7 @@ func (b *Bus) Run(ctx context.Context, output chan<- node.Output) error {
 						}
 					}()
 				}
+				wg.Wait()
 
 				b.checkDeadlock(n.ID())
 			}
@@ -434,6 +447,8 @@ func (b *Bus) checkDeadlock(fromOutputNode uuid.UUID) {
 			}
 		}
 		if strangled {
+			return
+			panic("DEADLOCK")
 			b.inputsMu.RUnlock()
 			b.shutDownChain(chained)
 			b.inputsMu.RLock()

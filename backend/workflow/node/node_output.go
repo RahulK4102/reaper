@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ghostsecurity/reaper/backend/workflow/transmission"
 	"golang.org/x/net/context"
+
+	"github.com/ghostsecurity/reaper/backend/workflow/transmission"
 )
 
 type OutputNode struct {
@@ -21,7 +22,7 @@ func NewOutput() *OutputNode {
 			false,
 			NewVarStorage(
 				Connectors{
-					NewConnector("input", transmission.TypeAny, true),
+					NewConnector("input", transmission.TypeAnyIn, true),
 					NewConnector("stdout", transmission.TypeBoolean, false),
 					NewConnector("stderr", transmission.TypeBoolean, false),
 					NewConnector("template", transmission.TypeString, false),

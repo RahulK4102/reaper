@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ghostsecurity/reaper/backend/workflow/transmission"
 	"golang.org/x/net/context"
+
+	"github.com/ghostsecurity/reaper/backend/workflow/transmission"
 )
 
 type DelayNode struct {
@@ -21,11 +22,11 @@ func NewDelay() *DelayNode {
 			false,
 			NewVarStorage(
 				Connectors{
-					NewConnector("input", transmission.TypeAny, true),
+					NewConnector("input", transmission.TypeAnyIn, true),
 					NewConnector("delay", transmission.TypeInt, false, "in milliseconds"),
 				},
 				Connectors{
-					NewConnector("output", transmission.TypeAny, true),
+					NewConnector("output", transmission.TypeAnyOut, true),
 				},
 				map[string]transmission.Transmission{
 					"delay": transmission.NewInt(1000),

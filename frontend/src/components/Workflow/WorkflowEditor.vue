@@ -39,10 +39,10 @@ const availableNodeTypes = ref(<NodeType[]>[
   NodeType.FUZZER,
   NodeType.OUTPUT,
   NodeType.VARIABLES,
-  NodeType.DELAY,
   NodeType.EXTRACTOR,
   NodeType.IF,
   NodeType.MERGER,
+  NodeType.STOP,
 ])
 
 const linkColour = '#444444'

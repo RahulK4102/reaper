@@ -54,7 +54,8 @@ const (
 	TypeStart
 	TypeBoolean
 	TypeChoice
-	TypeAny = 0
+	TypeAnyIn  = 0
+	TypeAnyOut = 0xffffffff
 )
 
 type Stringer interface{ String() string }

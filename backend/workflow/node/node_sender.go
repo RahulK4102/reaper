@@ -7,9 +7,10 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/net/context"
+
 	"github.com/ghostsecurity/reaper/backend/packaging"
 	"github.com/ghostsecurity/reaper/backend/workflow/transmission"
-	"golang.org/x/net/context"
 )
 
 type SenderNode struct {
@@ -29,6 +30,7 @@ func NewSender() *SenderNode {
 					NewConnector("request", transmission.TypeRequest, true),
 					NewConnector("replacements", transmission.TypeMap, true),
 					NewConnector("timeout", transmission.TypeInt, false, "in milliseconds"),
+					NewConnector("delay", transmission.TypeInt, false, "in milliseconds"),
 					NewConnector("follow_redirects", transmission.TypeBoolean, false, ""),
 					NewConnector("parallelism", transmission.TypeInt, false, "number of parallel requests"),
 				},
@@ -37,6 +39,7 @@ func NewSender() *SenderNode {
 				},
 				map[string]transmission.Transmission{
 					"timeout":          transmission.NewInt(5000),
+					"delay":            transmission.NewInt(0),
 					"follow_redirects": transmission.NewBoolean(false),
 					"parallelism":      transmission.NewInt(1),
 				},
@@ -48,6 +51,11 @@ func NewSender() *SenderNode {
 func (n *SenderNode) Start(ctx context.Context, in <-chan Input, out chan<- OutputInstance, _ chan<- Output) error {
 
 	timeout, err := n.ReadInputInt("timeout", nil)
+	if err != nil {
+		return err
+	}
+
+	delay, err := n.ReadInputInt("delay", nil)
 	if err != nil {
 		return err
 	}
@@ -124,6 +132,14 @@ func (n *SenderNode) Start(ctx context.Context, in <-chan Input, out chan<- Outp
 			case <-ctx.Done():
 				return ctx.Err()
 			case restrict <- struct{}{}:
+			}
+
+			if delay > 0 {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-time.After(time.Millisecond * time.Duration(delay)):
+				}
 			}
 
 			n.setBusy(true)

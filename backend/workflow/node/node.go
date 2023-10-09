@@ -58,6 +58,7 @@ const (
 	TypeExtractor
 	TypeIf
 	TypeMerger
+	TypeStop
 )
 
 func FromType(t Type) (Node, error) {
@@ -85,6 +86,8 @@ func FromType(t Type) (Node, error) {
 		real = NewIf()
 	case TypeMerger:
 		real = NewMerger()
+	case TypeStop:
+		real = NewStop()
 	default:
 		return nil, fmt.Errorf("unknown node type: %v", t)
 	}

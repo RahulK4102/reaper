@@ -99,7 +99,9 @@ func (a *App) RunWorkflow(w *workflow.WorkflowM) {
 	}
 	flow, err := w.Unpack()
 	if err != nil {
-		a.Error("Workflow error", err.Error())
+		if !errors.Is(err, node.ErrStopped) {
+			a.Error("Workflow error", err.Error())
+		}
 		return
 	}
 	ctx, cancel := context.WithCancel(a.ctx)
@@ -132,7 +134,7 @@ func (a *App) RunWorkflow(w *workflow.WorkflowM) {
 	if err := flow.Run(ctx, updateChan, outputChan); err != nil {
 		if errors.Is(err, context.Canceled) {
 			a.Notify("Workflow canceled", "The workflow was canceled.")
-		} else {
+		} else if !errors.Is(err, node.ErrStopped) {
 			a.Error("Workflow error", err.Error())
 		}
 	}

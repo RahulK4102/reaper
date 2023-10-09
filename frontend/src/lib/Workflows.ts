@@ -11,6 +11,7 @@ export const enum NodeType {
     EXTRACTOR = 9,
     IF = 10,
     MERGER = 11,
+    STOP = 12,
 }
 
 export const enum ParentType {
@@ -34,30 +35,32 @@ export const enum ChildType {
 }
 
 export function NodeTypeName(t: NodeType): string {
-  switch (t) {
-    case NodeType.FUZZER:
-      return 'Fuzzer'
-    case NodeType.STATUS_FILTER:
-      return 'Status Filter'
-    case NodeType.OUTPUT:
-      return 'Output'
-    case NodeType.REQUEST:
-      return 'Request'
-    case NodeType.START:
-      return 'Start'
-    case NodeType.SENDER:
-      return 'Sender'
-    case NodeType.VARIABLES:
-      return 'Variables'
-    case NodeType.DELAY:
-      return 'Delay'
-    case NodeType.EXTRACTOR:
-      return 'Extractor'
-    case NodeType.IF:
-      return 'If'
-    case NodeType.MERGER:
-      return 'Merger'
-    default:
-      return `Unknown (${t})`
-  }
+    switch (t) {
+        case NodeType.FUZZER:
+            return 'Fuzzer'
+        case NodeType.STATUS_FILTER:
+            return 'Status Filter'
+        case NodeType.OUTPUT:
+            return 'Output'
+        case NodeType.REQUEST:
+            return 'Request'
+        case NodeType.START:
+            return 'Start'
+        case NodeType.SENDER:
+            return 'Sender'
+        case NodeType.VARIABLES:
+            return 'Variables'
+        case NodeType.DELAY:
+            return 'Delay'
+        case NodeType.EXTRACTOR:
+            return 'Extractor'
+        case NodeType.IF:
+            return 'If'
+        case NodeType.MERGER:
+            return 'Merger'
+        case NodeType.STOP:
+            return 'Stop'
+        default:
+            return `Unknown (${t})`
+    }
 }
